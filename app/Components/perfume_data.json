@@ -1,0 +1,32 @@
+[
+  {
+      "name": "Midnight Oud",
+      "price": "150 USD",
+      "description": "A deep and smoky scent with notes of oud, amber, and sandalwood.",
+      "available": true
+  },
+  {
+      "name": "Rose Bouquet",
+      "price": "80 USD",
+      "description": "A fresh, floral fragrance with notes of rose and jasmine.",
+      "available": true
+  },
+  {
+      "name": "Citrus Breeze",
+      "price": "65 USD",
+      "description": "A light and refreshing fragrance with hints of lemon, orange, and bergamot.",
+      "available": true
+  },
+  {
+      "name": "Vanilla Dream",
+      "price": "90 USD",
+      "description": "A sweet and creamy scent with notes of vanilla, caramel, and a touch of musk.",
+      "available": false
+  },
+  {
+      "name": "RoboAds Mist",
+      "price": "120 USD",
+      "description": "An earthy fragrance with rich notes of cedarwood, patchouli, and moss.",
+      "available": true
+  }
+]
