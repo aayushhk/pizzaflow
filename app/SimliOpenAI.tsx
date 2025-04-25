@@ -105,7 +105,7 @@ const SimliOpenAI: React.FC<SimliOpenAIProps> = ({
           },
         },
         async ({ query }: { query: string }) => {
-          const result = await fetch("http://localhost:5000/query", {
+          const result = await fetch("http://3.209.152.5:5000/query", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
