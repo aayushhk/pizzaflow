@@ -87,6 +87,36 @@ const SimliOpenAI: React.FC<SimliOpenAIProps> = ({
         turn_detection: { type: "server_vad" },
         input_audio_transcription: { model: "whisper-1" },
       });
+      openAIClientRef.current.addTool(
+        {
+          name: 'get_product_details',
+          description:
+            'retrieves product details from knowledge base about the product like price, features, and description',
+          parameters: {
+            type: 'object',
+            properties: {
+              query: {
+                type: 'string',
+                description: 'This is the question about the product that user needs from knowledge base',
+              },
+
+            },
+            required: ['query'],
+          },
+        },
+        async ({ query }: { query: string }) => {
+          const result = await fetch("http://localhost:5000/query", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ query }),
+          });
+        
+          const json = await result.json();
+          return json;
+        }
+      );
 
       // Set up event listeners
       openAIClientRef.current.on(
