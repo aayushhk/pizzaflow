@@ -105,7 +105,7 @@ const SimliOpenAI: React.FC<SimliOpenAIProps> = ({
           },
         },
         async ({ query }: { query: string }) => {
-          const result = await fetch("http://3.209.152.5:5000/query", {
+          const result = await fetch("http://rnwwz-106-221-83-196.a.free.pinggy.link/query", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
