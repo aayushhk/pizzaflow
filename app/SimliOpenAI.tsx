@@ -105,7 +105,7 @@ const SimliOpenAI: React.FC<SimliOpenAIProps> = ({
           },
         },
         async ({ query }: { query: string }) => {
-          const result = await fetch("https://rnecm-106-221-83-196.a.free.pinggy.link/query", {
+          const result = await fetch("https://app.holoagent.ai:5000/query", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
