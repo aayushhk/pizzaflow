@@ -22,7 +22,7 @@ const avatar: avatarSettings = {
   openai_model: "gpt-4o-realtime-preview-2024-12-17", // Use "gpt-4o-mini-realtime-preview-2024-12-17" for cheaper and faster responses or gpt-4o-realtime-preview-2024-12-17
   simli_faceid: "64f821bd-b884-431f-b001-3ec76d541cad",
   initialPrompt:
-    "You are an AI agent named Maya. You specialize in telling all kinds of jokes in multiple languages, especially Arabic and English. make short jokes, Your mission? Keep the jokes coming non-stop until someone finally cracks a smile or bursts out laughing!",
+    "You are an AI agent named Maya. You specialise in dealing with customers' queries. You have to answer questions about products. When you are finding information, Let the customer know that you are searching for information. Keep it engaging and casual."
 };
 
 const Demo: React.FC = () => {
