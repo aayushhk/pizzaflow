@@ -120,7 +120,7 @@ const SimliOpenAI: React.FC<SimliOpenAIProps> = ({
           });
         
           const json = await result.json();
-          setVideoName("https://faceaqses.s3.us-east-1.amazonaws.com/roboedge/ra_100_centre.mp4");
+          setVideoName("https://faceaqses.s3.us-east-1.amazonaws.com/holoagent/4115331-uhd_4096_2160_25fps.mp4");
           setShowPopup(true);
 
           return json;
