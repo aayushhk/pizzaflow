@@ -13,7 +13,7 @@ import VideoPopupPlayer from "./Components/video-player";
 
 interface SimliOpenAIProps {
   simli_faceid: string;
-  openai_voice: "ash";
+  openai_voice: "alloy"|"ash"|"ballad"|"coral"|"echo"|"sage"|"shimmer"|"verse";
   openai_model: string;
   initialPrompt: string;
   onStart: () => void;
