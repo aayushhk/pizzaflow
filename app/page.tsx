@@ -20,7 +20,7 @@ const avatar: avatarSettings = {
   name: "Mohammad",
   openai_voice: "ash",
   openai_model: "gpt-4o-realtime-preview-2024-12-17", // Use "gpt-4o-mini-realtime-preview-2024-12-17" for cheaper and faster responses or gpt-4o-realtime-preview-2024-12-17
-  simli_faceid: "64f821bd-b884-431f-b001-3ec76d541cad",
+  simli_faceid: "d9c1545a-daca-4b46-bf5e-2245b634f406",
   initialPrompt:
     "You are an AI agent named Maya. You specialise in dealing with customers' queries. You have to answer questions about products. When you are finding information, Let the customer know that you are searching for information. Keep it engaging and casual."
 };
