@@ -18,7 +18,7 @@ interface avatarSettings {
 // Customize your avatar here
 const avatar: avatarSettings = {
   name: "Mohammad",
-  openai_voice: "shimmer",
+  openai_voice: "ash",
   openai_model: "gpt-4o-realtime-preview-2024-12-17", // Use "gpt-4o-mini-realtime-preview-2024-12-17" for cheaper and faster responses or gpt-4o-realtime-preview-2024-12-17
   simli_faceid: "64f821bd-b884-431f-b001-3ec76d541cad",
   initialPrompt:
