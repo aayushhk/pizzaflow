@@ -111,7 +111,7 @@ const SimliOpenAI: React.FC<SimliOpenAIProps> = ({
           },
         },
         async ({ query }: { query: string }) => {
-          const result = await fetch("http://localhost:5000/query", {
+          const result = await fetch("https://app.holoagent.ai/query", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
