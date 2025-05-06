@@ -6,10 +6,14 @@ import cn from "./utils/TailwindMergeAndClsx";
 import IconExit from "@/media/IconExit";
 import IconSparkleLoader from "@/media/IconSparkleLoader";
 import { on } from "events";
+import VideoPopupPlayer from "./Components/video-player";
+
+
+
 
 interface SimliOpenAIProps {
   simli_faceid: string;
-  openai_voice: "alloy"|"ash"|"ballad"|"coral"|"echo"|"sage"|"shimmer"|"verse";
+  openai_voice: "ash";
   openai_model: string;
   initialPrompt: string;
   onStart: () => void;
@@ -34,6 +38,8 @@ const SimliOpenAI: React.FC<SimliOpenAIProps> = ({
   const [error, setError] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const [userMessage, setUserMessage] = useState("...");
+  const [showPopup, setShowPopup] = useState(false);
+  const [videoName, setVideoName] = useState<string | null>(null);  
 
   // Refs for various components and states
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -105,7 +111,7 @@ const SimliOpenAI: React.FC<SimliOpenAIProps> = ({
           },
         },
         async ({ query }: { query: string }) => {
-          const result = await fetch("https://app.holoagent.ai/query", {
+          const result = await fetch("http://localhost:5000/query", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -114,6 +120,9 @@ const SimliOpenAI: React.FC<SimliOpenAIProps> = ({
           });
         
           const json = await result.json();
+          setVideoName("https://faceaqses.s3.us-east-1.amazonaws.com/roboedge/ra_100_centre.mp4");
+          setShowPopup(true);
+
           return json;
         }
       );
@@ -438,16 +447,52 @@ const SimliOpenAI: React.FC<SimliOpenAIProps> = ({
     }
   }, []);
 
+
   return (
     <>
+      {/* Fullscreen Background Video Layer */}
+      {isAvatarVisible && videoName && (
+        <video
+          src={`${videoName}`}
+          autoPlay
+          onEnded={() => setVideoName(null)}
+          className="fixed inset-0 z-40 w-full h-full object-cover transition-all duration-700 ease-in-out"
+        />
+      )}
+  
+      {/* Avatar Wrapper - Responsive Stage */}
       <div
-        className={`transition-all duration-300 ${
-          showDottedFace ? "h-0 overflow-hidden" : "h-auto"
-        }`}
+        className={cn(
+          "transition-all duration-700 ease-in-out z-50",
+          isAvatarVisible && videoName
+            ? "fixed bottom-4 right-4 w-[400px] h-[400px] bg-black/10 rounded-xl flex items-center justify-center overflow-hidden shadow-xl"
+            : "flex justify-center items-center h-[calc(100vh-150px)] w-full relative"
+        )}
       >
-        <VideoBox video={videoRef} audio={audioRef} />
+        <div
+          className={cn(
+            "transition-transform duration-700 ease-in-out",
+            isAvatarVisible && videoName
+              ? "scale-75 origin-center"
+              : "scale-100"
+          )}
+        >
+          <VideoBox video={videoRef} audio={audioRef} />
+        </div>
       </div>
-      <div className="flex flex-col items-center">
+  
+      {/* Close Button for Video */}
+      {isAvatarVisible && videoName && (
+        <button
+          onClick={() => setVideoName(null)}
+          className="fixed top-4 right-4 text-white bg-black/50 hover:bg-black rounded-full px-3 py-1 text-xl z-50 transition-all duration-300"
+        >
+          ✕
+        </button>
+      )}
+  
+      {/* Interaction Buttons */}
+      <div className="flex flex-col items-center z-10 relative">
         {!isAvatarVisible ? (
           <button
             onClick={handleStart}
@@ -466,24 +511,27 @@ const SimliOpenAI: React.FC<SimliOpenAIProps> = ({
             )}
           </button>
         ) : (
-          <>
-            <div className="flex items-center gap-4 w-full">
-              <button
-                onClick={handleStop}
-                className={cn(
-                  "mt-4 group text-white flex-grow bg-red hover:rounded-sm hover:bg-white h-[52px] px-6 rounded-[100px] transition-all duration-300"
-                )}
-              >
-                <span className="font-abc-repro-mono group-hover:text-black font-bold w-[164px] transition-all duration-300">
-                  Stop Interaction
-                </span>
-              </button>
-            </div>
-          </>
+          <div className="flex items-center gap-4 w-full mt-4">
+            <button
+              onClick={() => {
+                handleStop();
+                setVideoName(null);
+              }}
+              className="group text-white flex-grow bg-red hover:rounded-sm hover:bg-white h-[52px] px-6 rounded-[100px] transition-all duration-300"
+            >
+              <span className="font-abc-repro-mono group-hover:text-black font-bold w-[164px] transition-all duration-300">
+                Stop Interaction
+              </span>
+            </button>
+          </div>
         )}
       </div>
     </>
   );
+  
+
+
+ 
 };
 
 export default SimliOpenAI;
