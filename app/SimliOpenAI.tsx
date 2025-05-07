@@ -105,23 +105,74 @@ const SimliOpenAI: React.FC<SimliOpenAIProps> = ({
                 type: 'string',
                 description: 'This is the question about the product that user needs from knowledge base',
               },
+              userid: {
+                type: 'string',
+                description: 'This the user id that this llm will send to knowledge base llm. Send the current user id',
+              },
 
             },
-            required: ['query'],
+
+            required: ['query','userid'],
           },
         },
-        async ({ query }: { query: string }) => {
-          const result = await fetch("https://app.holoagent.ai/query", {
+        async ({ query,userid }: { query: string,userid:string }) => {
+          const result = await fetch("http://localhost:5001/query", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ query }),
+            body: JSON.stringify({ query,userid }),
           });
         
           const json = await result.json();
-          setVideoName("https://faceaqses.s3.us-east-1.amazonaws.com/holoagent/4115331-uhd_4096_2160_25fps.mp4");
+          // setVideoName("https://faceaqses.s3.us-east-1.amazonaws.com/roboedge/ra_100_centre.mp4");
+          // setShowPopup(true);
+
+          return json;
+        }
+      );
+
+    
+      openAIClientRef.current.addTool(
+        {
+          name: 'play_product_video',
+          description:
+            'plays the video of the product that user needs from the memory. IF the video is not in memory, it will call the knowledge base to fetch the video. If the video link is not available, or if it looks invalid, it will call the knowledge base to fetch the video',
+          parameters: {
+            type: 'object',
+            properties: {
+              query: {
+                type: 'string',
+                description: 'This is the video about the product that user needs from knowledge base. This is the request that this llm will send to knowledge base llm',
+              },
+              video_url: {
+                type: 'string',
+                description: 'This is the video url that user needs to play from knowledge base. IF the video is not in memory, it will call the knowledge base with query to fetch the video and play it. This is just the URL without any other text',
+              },
+              userid: {
+                type: 'string',
+                description: 'This the user id that this llm will send to knowledge base llm. Send the current user id',
+              },
+
+            },
+            required: ['query','video_url','userid'],
+          },
+        },
+        async ({ query,video_url,userid }: { query: string,video_url:string,userid:string }) => {
+          const result = await fetch("http://localhost:5001/video", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ query,userid }),
+          });
+        
+          const json = await result.json();
+          setVideoName(video_url);
+          if (videoName !== null) {
+            
           setShowPopup(true);
+        }
 
           return json;
         }
