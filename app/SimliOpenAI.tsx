@@ -147,7 +147,7 @@ const SimliOpenAI: React.FC<SimliOpenAIProps> = ({
               },
               video_name: {
                 type: 'string',
-                description: 'This is the video name that user needs to play from knowledge base. IF the video is not in memory, it will call the knowledge base with query to fetch the video and play it. This is just the video name without any other text. Ends with .mp4',
+                description: 'This is the video url that user needs to play from knowledge base. IF the video is not in memory, it will call the knowledge base with query to fetch the video and play it. This is just the video url without any other text. Ends with .mp4',
               },
               userid: {
                 type: 'string',
