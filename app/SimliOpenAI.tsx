@@ -116,7 +116,7 @@ const SimliOpenAI: React.FC<SimliOpenAIProps> = ({
           },
         },
         async ({ query,userid }: { query: string,userid:string }) => {
-          const result = await fetch("http://localhost:5001/query", {
+          const result = await fetch("https://app.holoagent.ai/query", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -159,7 +159,7 @@ const SimliOpenAI: React.FC<SimliOpenAIProps> = ({
           },
         },
         async ({ query,video_url,userid }: { query: string,video_url:string,userid:string }) => {
-          const result = await fetch("http://localhost:5001/video", {
+          const result = await fetch("https://app.holoagent.ai/video", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
