@@ -145,9 +145,9 @@ const SimliOpenAI: React.FC<SimliOpenAIProps> = ({
                 type: 'string',
                 description: 'This is the video about the product that user needs from knowledge base. This is the request that this llm will send to knowledge base llm',
               },
-              video_name: {
+              video_url: {
                 type: 'string',
-                description: 'This is the video url that user needs to play from knowledge base. IF the video is not in memory, it will call the knowledge base with query to fetch the video and play it. This is just the video url without any other text. Ends with .mp4',
+                description: 'This is the video url that user needs to play from knowledge base. IF the video is not in memory, it will call the knowledge base with query to fetch the video and play it. This is just the video URL without any other text. Ends with .mp4',
               },
               userid: {
                 type: 'string',
@@ -155,10 +155,10 @@ const SimliOpenAI: React.FC<SimliOpenAIProps> = ({
               },
 
             },
-            required: ['query','video_name','userid'],
+            required: ['query','video_url','userid'],
           },
         },
-        async ({ query,video_name,userid }: { query: string,video_name:string,userid:string }) => {
+        async ({ query,video_url,userid }: { query: string,video_url:string,userid:string }) => {
           const result = await fetch("https://app.holoagent.ai/video", {
             method: "POST",
             headers: {
@@ -168,7 +168,7 @@ const SimliOpenAI: React.FC<SimliOpenAIProps> = ({
           });
         
           const json = await result.json();
-          setVideoName(`/media/${video_name}`);
+          setVideoName(video_url);
           if (videoName !== null) {
             
           setShowPopup(true);
