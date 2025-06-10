@@ -41,7 +41,7 @@ const SimliOpenAI: React.FC<SimliOpenAIProps> = ({
   const [showPopup, setShowPopup] = useState(false);
   const [videoName, setVideoName] = useState<string | null>(null);  
   const [email, setEmail] = useState("");
-  const [userid, setUserId] = useState("questions");
+  const [userid, setUserId] = useState("pizzaflow");
 
 const emailRef = useRef(email);
 const useridRef = useRef(userid);
@@ -120,10 +120,103 @@ useEffect(() => {
       // --------- TOOLS ----------
 
       // Fetches all the questions for the given userid
-      openAIClientRef.current.addTool(
+
+openAIClientRef.current.addTool(
   {
-    name: 'get_question_set',
-    description: 'Fetches the question set for the current user.',
+    name: "get_product_details",
+    description:
+      "retrieves product details from knowledge base about the product like price, features, and description",
+    parameters: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description: "This is the question about the product that user needs from knowledge base",
+        },
+        userid: {
+          type: "string",
+          description: "This the user id that this llm will send to knowledge base llm. Send the current user id",
+        },
+      },
+      required: ["query", "userid"],
+    },
+  },
+  async ({ query, userid }: { query: string; userid: string }) => {
+    try {
+      const result = await fetch("https://holoagent.app.n8n.cloud/webhook/query", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query, userid }),
+      });
+
+      if (!result.ok) throw new Error("Failed to fetch product details");
+
+      // Use result.text() instead of result.json() since the response is plain text
+      const textResponse = await result.text();
+
+      // Return the text response in a structured format
+      return {
+        success: true,
+        description: textResponse.trim(),
+      };
+    } catch (err) {
+      console.error("Error fetching product details:", err);
+      return { error: "Failed to retrieve product details" };
+    }
+  }
+);
+openAIClientRef.current.addTool(
+  {
+    name: "get_selected_product_addons_and_sizes",
+    description:
+      "retrieves product addons and available sizes from knowledge base about the selected product  ",
+    parameters: {
+      type: "object",
+      properties: {
+       selected_item_name: {
+          type: "string",
+          description: "User is intrested in this product and wants to know about addons and sizes",
+        },
+        userid: {
+          type: "string",
+          description: "This the user id that this llm will send to knowledge base llm. Send the current user id",
+        },
+      },
+      required: ["selected_item_name", "userid"],
+    },
+  },
+  async ({ selected_item_name, userid }: { selected_item_name: string; userid: string }) => {
+    try {
+      const result = await fetch("https://holoagent.app.n8n.cloud/webhook/get-addons", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({selected_item_name, userid }),
+      });
+
+      if (!result.ok) throw new Error("Failed to fetch product addons and sizes");
+
+      // Use result.text() instead of result.json() since the response is plain text
+      const textResponse = await result.text();
+
+      // Return the text response in a structured format
+      return {
+        success: true,
+        description: textResponse.trim(),
+      };
+    } catch (err) {
+      console.error("Error fetching product details:", err);
+      return { error: "Failed to retrieve product details" };
+    }
+  }
+);
+openAIClientRef.current.addTool(
+  {
+    name: 'get_all_menu_items',
+    description: 'Fetches all the items in the menu.',
     parameters: {
       type: 'object',
       properties: {}, // No external input required
@@ -131,7 +224,7 @@ useEffect(() => {
     
   },
   async () => {
-    const result = await fetch("https://holoagent.app.n8n.cloud/webhook/questions", {
+    const result = await fetch("https://holoagent.app.n8n.cloud/webhook/menu", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -143,58 +236,176 @@ useEffect(() => {
     return json;
   }
 );
-
-
-
-      // Scores the user after the interview is finished
-      openAIClientRef.current.addTool(
-        {
-          name: 'set_final_score',
-          description:
-            'Scores the interviee based on the answers given by the user. Score is between 0 to 100. Use this tool when the interview is finished. ',
-          parameters: {
-            type: 'object',
-            properties: {
-              score: {
-                type: 'string',
-                description: 'This is the score that this llm will give to the user based on the answers given by the user.Give a score between 0 to 100',
-              },
-              feedback: {
-                type: 'string',
-                description: 'This is the final feedback after the interview. ',
-              },
-              question: {
-                type: 'string',
-                description: 'These are all the questions that were asked. This llm will give score based on these question',
-              },
-              answer: {
-                type: 'string',
-                description: 'These are all the answers that was given by the user. This llm will give score based on these answer',
-              },
-              
-
-            },
-            required: ['score','feedback','question','answer'],
-          },
+openAIClientRef.current.addTool(
+  {
+    name: 'submit_order',
+    description: 'Creates a new order with the provided details.',
+    parameters: {
+      type: 'object',
+      properties: {
+        selected_item_name:{
+          type: 'string',
+          description: 'The name of the item to order.',
         },
-        async ({ score,feedback,question,answer}: { score: string,question:string,answer:string,feedback:string }) => {
-          const result = await fetch("https://holoagent.app.n8n.cloud/webhook/setscore", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ score,feedback,question,answer,userid:emailRef.current }), // Accessing from component state
-          });
-        
-          const json = await result.text();
-          // setVideoName(video_url);
-          // if (videoName !== null) {
-            
-          // setShowPopup(true);}
+        selected_addons: {
+          type: 'string',
+          description: 'The selected addons for the item, if any.',
+        },
+        selected_size: {
+          type: 'string',
+          description: 'The selected size for the item, if applicable.',
+        },
+        quantity: {
+          type: 'integer',
+          description: 'The quantity of the item to order.',
+        },
+      }, 
+      required: ["selected_item_name", "selected_addons", "selected_size", "quantity"],
+    },
+    
+  },
+  async ({ selected_item_name,selected_addons,selected_size,quantity}: { selected_item_name: string;selected_addons:string;selected_size:string;quantity:string }) => {
+    const result = await fetch("https://holoagent.app.n8n.cloud/webhook/submit_order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({email:emailRef.current,selected_item_name,selected_addons,selected_size,quantity }), // Accessing from component state
+    });
+    console.log("Using email:", emailRef.current);
+    const json = await result.text();
+    return json;
+  }
+);
 
-          return json;
+openAIClientRef.current.addTool(
+  {
+    name: "play_product_video",
+    description:
+      "Plays a video based on the provided video_url or fetches a video URL from the knowledge base. Supports S3 URLs (.mp4, .mov) and external URLs (YouTube, Vimeo, etc.).",
+    parameters: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description:
+            "The query about the product video to send to the knowledge base if video_url is not provided.",
+        },
+        video_url: {
+          type: "string",
+          description:
+            "The video URL to play. Can be an S3 URL (.mp4, .mov) or an external URL (YouTube, Vimeo, etc.). If not provided, the video will be fetched using the query.",
+        },
+        userid: {
+          type: "string",
+          description: "The user ID to send to the knowledge base.",
+        },
+      },
+      required: ["query", "userid"],
+      additionalProperties: false,
+    },
+  },
+  async ({ query, video_url, userid }: { query: string; video_url?: string; userid: string }) => {
+    console.log("play_product_video tool called with parameters:", {
+      query,
+      video_url,
+      userid,
+    });
+
+    try {
+      if (video_url) {
+        const isS3Video = video_url.endsWith(".mp4") || video_url.endsWith(".mov");
+        const isExternalVideo = video_url.includes("youtube.com") || video_url.includes("vimeo.com") || video_url.includes("instagram.com");
+        if (isS3Video || isExternalVideo) {
+          console.log("Valid video_url provided, setting videoName:", video_url);
+          setVideoName(video_url);
+          return { message: "Playing video from provided URL", video_url };
+        } else {
+          console.log("Invalid video_url provided:", video_url);
+          throw new Error("Invalid video URL format");
         }
-      );
+      }
+
+      console.log("No valid video_url provided, fetching from API...");
+      const requestPayload = { query, userid };
+      console.log("API request payload:", requestPayload);
+
+      const result = await fetch("https://holoagent.app.n8n.cloud/webhook/video", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestPayload),
+      });
+
+      console.log("API response status:", result.status, result.statusText);
+      console.log("API response headers:", Object.fromEntries(result.headers));
+
+      if (!result.ok) {
+        throw new Error(`Failed to fetch video: ${result.statusText}`);
+      }
+
+      // Get the raw response text first for debugging
+      const responseText = await result.text();
+      console.log("Raw API response text:", responseText);
+
+      // Extract video URL from the response
+      let videoUrl;
+      const contentType = result.headers.get("Content-Type") || "";
+      console.log("Content-Type:", contentType);
+
+      if (contentType.includes("application/json")) {
+        try {
+          const responseData = JSON.parse(responseText);
+          console.log("Parsed JSON response:", responseData);
+
+          if (responseData && responseData.response && typeof responseData.response === "string") {
+            videoUrl = responseData.response;
+          } else if (responseData && responseData.video_url && typeof responseData.video_url === "string") {
+            videoUrl = responseData.video_url; // Handle alternative JSON structure
+          } else {
+            console.log("Missing video URL in JSON response:", responseData);
+            throw new Error("Missing video URL in JSON response");
+          }
+        } catch (jsonError) {
+          console.error("JSON parsing failed:", jsonError);
+          // Fallback to text parsing if JSON parsing fails
+          console.log("Falling back to text parsing...");
+        }
+      }
+
+      // If JSON parsing failed or Content-Type is not JSON, try extracting URL from text
+      if (!videoUrl) {
+        // Match URLs in markdown (e.g., [text](url)) or standalone URLs
+        const urlMatch = responseText.match(/\((https?:\/\/[^\s)]+)\)/) || responseText.match(/(https?:\/\/[^\s]+)/);
+        if (urlMatch) {
+          videoUrl = urlMatch[1];
+        } else {
+          console.log("No valid URL found in response:", responseText);
+          throw new Error("No valid video URL found in response");
+        }
+      }
+
+      // Validate the extracted video URL
+      const isS3Video = videoUrl.endsWith(".mp4") || videoUrl.endsWith(".mov");
+      const isExternalVideo = videoUrl.includes("youtube.com") || videoUrl.includes("vimeo.com") || videoUrl.includes("instagram.com");
+      if (isS3Video || isExternalVideo) {
+        console.log("Valid video URL received, setting videoName:", videoUrl);
+        setVideoName(videoUrl);
+        //setAvatarPosition({ x: 0, y: 0 });
+        return { message: "Video fetched and playing", video_url: videoUrl };
+      } else {
+        console.log("Invalid video URL received:", videoUrl);
+        throw new Error("Invalid video URL format in response");
+      }
+    } catch (err) {
+      console.error("Error in play_product_video:", err);
+      setError(`Failed to fetch or play video: ${(err as Error).message}`);
+      return { error: "Failed to fetch or play video", details: (err as Error).message };
+    }
+  }
+);
+
 
       // Set up event listeners
       openAIClientRef.current.on(
