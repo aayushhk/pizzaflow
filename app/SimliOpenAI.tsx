@@ -265,7 +265,7 @@ openAIClientRef.current.addTool(
     
   },
   async ({ selected_item_name,selected_addons,selected_size,quantity}: { selected_item_name: string;selected_addons:string;selected_size:string;quantity:string }) => {
-    const result = await fetch("https://holoagent.app.n8n.cloud/webhook/submit_order", {
+    const result = await fetch("https://holoagent.app.n8n.cloud/webhook/submit-order", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
